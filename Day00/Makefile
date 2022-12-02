@@ -8,11 +8,8 @@ build: ${DAY}.cpp Utilities.cpp
 example:
 	make build && echo && echo && ./${DAY}.o example.txt
 
-input1:
-	make build && echo && echo && ./${DAY}.o input1.txt
-
-input2:
-	make build && echo && echo && ./${DAY}.o input2.txt
+input:
+	make build && echo && echo && ./${DAY}.o input.txt
 
 clean:
 	rm ${DAY}.o
