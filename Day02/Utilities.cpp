@@ -1,0 +1,40 @@
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iostream>
+
+std::vector<std::string> getAllLines(char *fileName)
+{
+    std::fstream filestream(fileName);
+
+    if (!filestream.is_open())
+    {
+        exit(1);
+    }
+
+    std::vector<std::string> result;
+
+    std::string line;
+    while (getline(filestream, line))
+    {
+        result.push_back(line);
+    }
+
+    return result;
+}
+
+std::vector<std::string> readFile(int argc, char **argv)
+{
+    if (argc != 2)
+    {
+        std::cout << "You must provide a filename as the first argument" << std::endl;
+
+        exit(1);
+    }
+
+    char *fileName = argv[1];
+
+    std::cout << "Input file: " << fileName << std::endl;
+
+    return getAllLines(fileName);
+}
