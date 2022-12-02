@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#define PART2 2
+
 std::vector<std::string> getAllLines(char *fileName)
 {
     std::fstream filestream(fileName);
@@ -25,7 +27,7 @@ std::vector<std::string> getAllLines(char *fileName)
 
 std::vector<std::string> readFile(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
         std::cout << "You must provide a filename as the first argument" << std::endl;
 
@@ -37,4 +39,14 @@ std::vector<std::string> readFile(int argc, char **argv)
     std::cout << "Input file: " << fileName << std::endl;
 
     return getAllLines(fileName);
+}
+
+bool isPart2(int argc, char **argv)
+{
+    if (argc < 3)
+    {
+        return false;
+    }
+
+    return (argv[2][0] - '0') == PART2;
 }
