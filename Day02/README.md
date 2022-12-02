@@ -15,6 +15,13 @@ Notice that the `SCORE_LOSE` and `SCORE_WIN` are swapped.
 
 Rather than keep a rolling sum, I chose to keep a list of scores, since I didn't know what part 2 would look like. Therefore, to get the total score, I got to delve into the `aggregate` method, which is found in the `numeric` namespace. It works well enough and I have no complains about it besides I just wish it were prettier. It makes me realize how extension methods have truly made C# a beautiful language.
 
+For part 2, I made an attempt to keep the part 1 code intact. However, rather than some runtime method of selecting which path, I chose to comment out and replace the line
+that called the part 1 code.
+In the future, it may be nice to do some sort of `make 1 example` which would indicate "use part 1 and the example file", while `make 2 input` would indicate
+"use part 2 and the input file".
+
+I think I'll update my template now.
+
 ## Part 1
 
 > The Elves begin to set up camp on the beach. To decide whose tent gets to be closest to the snack storage, a giant Rock Paper Scissors tournament is already in progress.
