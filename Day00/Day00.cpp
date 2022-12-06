@@ -6,28 +6,31 @@
 
 using namespace std;
 
-void solvePart1(vector<string> input)
+void solvePart1(const vector<string> &lines)
 {
     cout << "Solving part 1\n";
 
-    for (string s : input) {
-        cout << s << '\n';
+    for (string line : lines)
+    {
+        cout << line << '\n';
     }
 }
 
-void solvePart2(vector<string> input)
+void solvePart2(const vector<string> &lines)
 {
     cout << "Solving part 2\n";
 
-    for (string s : input) {
-        cout << s << '\n';
+    for (string line : lines)
+    {
+        cout << line << '\n';
     }
 }
 
 int main(int argc, char **argv)
 {
     vector<string> lines = readFile(argc, argv);
-    bool part2 = isPart2(argc, argv);
 
-    part2 ? solvePart2(lines) : solvePart1(lines);
+    isPart2(argc, argv)
+        ? solvePart2(lines)
+        : solvePart1(lines);
 }
