@@ -4,100 +4,72 @@
 #include <regex>
 #include <optional>
 
-#include "Item.h"
-#include "Dir.h"
-#include "File.h"
+#include "Dir.cpp"
+#include "Tree.h"
 #include "Utilities.h"
 
 using namespace std;
 
-Dir process_dir(const string &str)
+bool is_cmd(const string &str)
 {
-    const regex dir_pattern("^dir (.*)");
+    return regex_search(str, regex("^\\$"));
+}
+
+bool try_get_cd(const string &str, string *dest)
+{
+    const regex cd_pattern("^\\$ cd (.*)");
 
     smatch matches;
 
-    if (!regex_match(str, matches, dir_pattern) || matches.size() != 1)
+    if (!regex_match(str, matches, cd_pattern) || matches.size() != 2)
     {
-        cout << "UNABLE TO PARSE DIR: " << str;
-        exit(1);
+        return false;
     }
+    else
+    {
+        *dest = matches[1];
 
-    return Dir(matches[0]);
+        return true;
+    }
 }
 
-File process_file(const string &str)
+bool is_ls(const string &str)
 {
-    const regex file_pattern("^(.*) (.*)");
+    const regex ls_pattern("^\\$ ls");
 
-    smatch matches;
-
-    if (!regex_match(str, matches, file_pattern) || matches.size() != 2)
-    {
-        cout << "UNABLE TO PARSE FILE: " << str;
-        exit(1);
-    }
-
-    string name = matches[0];
-    int size = stoi(matches[1]);
-
-    return File(name, size);
-}
-
-Item process_item(const string &str)
-{
-    const regex dir_pattern("^dir (.*)");
-    const regex file_pattern("^(.*) (.*)");
-
-    if (regex_search(str, dir_pattern))
-    {
-        return process_dir(str);
-    }
-
-    if (regex_search(str, file_pattern))
-    {
-        return process_file(str);
-    }
-
-    cout << "UNSUPPORTED LINE: " << str;
-    exit(1);
-}
-
-Item get_tree(const vector<string> &lines)
-{
-    const regex cmd_regex("\\$ (.*)");
-    const regex is_ls("ls");
-    const regex is_cd("cd");
-
-    optional<Dir> dir = nullopt;
-    for (const auto &line : lines)
-    {
-        smatch matches;
-        bool is_command = regex_match(line, matches, cmd_regex);
-
-        if (!dir.has_value())
-        {
-            if (!is_command || matches.size() < 1)
-            {
-                cout << "Expected a command next\n";
-                exit(1);
-            }
-
-            if (regex_search(line, is_cd))
-            {
-                dir.emplace(process_dir(matches[0]));
-            }
-        }
-    }
-
-    return Dir("name");
+    return regex_match(str, ls_pattern);
 }
 
 void solvePart1(const vector<string> &lines)
 {
     cout << "Solving part 1\n";
 
-    Item root = get_tree(lines);
+    Tree files;
+    vector<string> output;
+
+    for (auto it = lines.begin() + 1; it != lines.end(); ++it) // skip the first cd
+    {
+        string dest;
+        if (try_get_cd(*it, &dest))
+        {
+            files.cd(dest);
+
+            continue;
+        }
+
+        vector<string> output;
+
+        while (!is_cmd(*(it + 1))) // until the last line of output
+        {
+            ++it;
+
+            output.push_back(*it);
+        }
+
+        output.push_back(*it); // add the last line
+
+        files.ls(output);
+    }
 }
 
 void solvePart2(const vector<string> &lines)

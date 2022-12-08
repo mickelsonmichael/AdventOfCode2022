@@ -1,45 +1,46 @@
-#include <vector>
+#ifndef DIR_H
+#define DIR_H
+
 #include <string>
-#include <algorithm>
-#include <sstream>
+#include <vector>
+#include <iostream>
 
-#include "Item.h"
-#include "Dir.h"
-
-Dir::Dir(const std::string &name) : Item{name}, items() {}
-
-std::vector<Item> Dir::get_items() const
+class Dir
 {
-    return std::vector<Item>(items);
-}
+private:
+    std::vector<Dir> _children;
+    std::vector<std::string> _filenames;
+    double _size;
+    const Dir *_parent;
+    const std::string _name;
 
-void Dir::add(Item item)
-{
-    items.push_back(item);
-}
-
-int Dir::size() const
-{
-    int sz = 0;
-
-    for (Item item : items)
+public:
+    Dir(const std::string &name, const Dir *parent) : _children(), _filenames(), _size(0), _parent(parent), _name(name){};
+    std::vector<Dir> children() const
     {
-        sz += item.size();
+        return _children;
     }
-
-    return sz;
-}
-
-std::string Dir::str() const
-{
-    std::stringstream ss;
-
-    ss << "- " << get_name() << " (dir)\n";
-
-    for (const auto it : get_items())
+    void add(Dir child)
     {
-        ss << "\t" << it.str();
+        _children.push_back(child);
     }
+    void add(const std::string &name, const int &sz)
+    {
+        _filenames.push_back(name);
+        _size += sz;
+    }
+    int size() const
+    {
+        return _size;
+    }
+    std::string name() const
+    {
+        return _name;
+    }
+    bool is_root() const
+    {
+        return _parent == nullptr;
+    }
+};
 
-    return ss.str();
-}
+#endif

@@ -19,6 +19,12 @@ std::vector<std::string> getAllLines(char *fileName)
     std::string line;
     while (getline(filestream, line))
     {
+        // Remove the endline
+        if (line.find('\r') == line.size() - 1)
+        {
+            line = line.substr(0, line.size() - 1);
+        }
+
         result.push_back(line);
     }
 
