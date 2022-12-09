@@ -9,14 +9,17 @@ class Dir
 {
 private:
     std::vector<Dir> _children;
-    std::vector<std::string> _filenames;
     double _size;
-    const Dir *_parent;
-    const std::string _name;
+    Dir *_parent;
+    std::string _name;
 
 public:
-    Dir(const std::string &name, const Dir *parent) : _children(), _filenames(), _size(0), _parent(parent), _name(name){};
-    std::vector<Dir> children() const
+    Dir(std::string n, Dir *parent)
+        : _children(),
+          _size(0),
+          _parent(parent),
+          _name(n){};
+    std::vector<Dir>& children()
     {
         return _children;
     }
@@ -24,14 +27,20 @@ public:
     {
         _children.push_back(child);
     }
-    void add(const std::string &name, const int &sz)
+    void add(std::string name, int sz)
     {
-        _filenames.push_back(name);
         _size += sz;
     }
     int size() const
     {
-        return _size;
+        int total_size = _size;
+
+        for (auto child : _children)
+        {
+            total_size += child.size();
+        }
+
+        return total_size;
     }
     std::string name() const
     {
@@ -40,6 +49,10 @@ public:
     bool is_root() const
     {
         return _parent == nullptr;
+    }
+    Dir *parent()
+    {
+        return _parent;
     }
 };
 

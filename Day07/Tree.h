@@ -15,6 +15,8 @@ private:
 
 public:
     Tree();
+    Dir* current() const;
+    Dir root() const;
     void ls(const std::vector<std::string> &lines);
     void cd(const std::string &dest);
 };
