@@ -7,9 +7,9 @@
 
 std::vector<std::string> getAllLines(char *fileName)
 {
-    std::fstream filestream(fileName);
+    std::fstream fs(fileName);
 
-    if (!filestream.is_open())
+    if (!fs.is_open())
     {
         exit(1);
     }
@@ -17,7 +17,7 @@ std::vector<std::string> getAllLines(char *fileName)
     std::vector<std::string> result;
 
     std::string line;
-    while (getline(filestream, line))
+    while (getline(fs, line))
     {
         // Remove the endline
         if (line.find('\r') == line.size() - 1)
