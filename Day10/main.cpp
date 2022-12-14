@@ -53,10 +53,22 @@ void solvePart2(const vector<string> &lines)
 {
     cout << "Solving part 2\n";
 
+    CPU cpu;
+
     for (string line : lines)
     {
-        cout << line << '\n';
+        int to_add;
+        if (try_get_addx(line, &to_add))
+        {
+            cpu.addx(to_add);
+        }
+        else
+        {
+            cpu.noop();
+        }
     }
+
+    cpu.print();
 }
 
 int main(int argc, char **argv)

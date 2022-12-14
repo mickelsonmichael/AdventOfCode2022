@@ -9,3 +9,5 @@ That could mean during an `addx` or `noop`, the result of the previous instructi
 In reality, I was just able to do a simple `next()` twice, and add the register in between.
 A lot simpler, but a lot less engaging.
 Here's hoping part 2 is a bit more challenging.
+
+Part 2 was alright. I had a slight mistake with a modulo calculation, but otherwise everything went smoothly.
