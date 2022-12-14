@@ -39,7 +39,7 @@ Here is a rough explanation as I understand it:
 When working with modulus arithmetic, there is a property that holds true:
 
 ```math
-(x % (m * n) ) % n == x % n
+(x \% (m * n) ) \% n == x \% n
 ```
 
 Which more or less states a relationship between a number, `x` and a multiple of the modulus `m * x`.
