@@ -2,6 +2,8 @@
 #include <utility>
 #include <list>
 #include <algorithm>
+#include <queue>
+#include <optional>
 
 #include "node.cpp"
 
@@ -83,171 +85,89 @@ public:
         }
     }
 
+    size_t get_index(const size_t &r, const size_t &c)
+    {
+        return (r * _row_size) + c;
+    }
+
     size_t steps_to_optimal_signal() const
     {
-        vector<size_t> distances(_row_size * _col_size);
-        vector<size_t> previous_distances(_row_size * _col_size);
+        vector<size_t> distances(_row_size * _col_size, SIZE_MAX);
+        distances[(_row_size * _current.first) + _current.second] = 0;
 
-        vector<Node> nodes;
-        Node *current_node;
-
+        vector<pair<size_t, size_t>> to_visit;
         for (size_t r = 0; r < _grid.size(); ++r)
-        {
             for (size_t c = 0; c < _grid[r].size(); ++c)
-            {
-                bool start = is_start(r, c);
-                size_t idx = (r * _row_size) + _col_size;
+                to_visit.push_back(pair<size_t, size_t>(r, c));
 
-                Node n(r, c, start ? 0 : SIZE_MAX);
-
-                nodes.push_back(n);
-            }
-        }
-
-        for (auto &this_node : nodes)
+        const size_t num_rows = _row_size;
+        while (!to_visit.empty())
         {
-            cout << "[" << this_node.row << ", " << this_node.col
-                << "] ";
-
-            if (this_node.col == _col_size - 1)
-            {
-                cout << '\n';
-            }
-
-            if (is_start(this_node.row, this_node.col))
-            {
-                current_node = &this_node;
-            }
-        }
-
-        auto find_node = [nodes](const size_t &r, const size_t &c)
-        {
-            auto ptr = find_if(
-                nodes.begin(),
-                nodes.end(),
-                [r, c](Node n)
-                { return n.row == r && n.col == c; });
-
-            // get rid of the constness provided by find
-            const Node *node = &(*ptr);
-
-            return const_cast<Node *>(node);
-        };
-
-        cout << "Grid is a " << _row_size << " by " << _col_size << '\n';
-
-        while (current_node != nullptr)
-        {
-            cout << "Visiting node: [" << current_node->row
-                 << ", " << current_node->col
-                 << "] -> (d=" << current_node->distance() << ")\n";
-
-            current_node->visit();
-
-            // if we've reached the destination at the shortest path already
-            // we can stop early
-            if (is_end(*current_node))
-            {
-                bool is_smallest = true;
-                for (const auto &other_node : nodes)
+            auto current = min_element(
+                to_visit.begin(),
+                to_visit.end(),
+                [distances, num_rows](const pair<size_t, size_t> &lhs, const pair<size_t, size_t> &rhs)
                 {
-                    if (other_node.distance() < current_node->distance())
-                    {
-                        is_smallest = false;
-                        break;
-                    }
+                    return distances[(num_rows * lhs.first) + lhs.second] < distances[(num_rows * rhs.first) + rhs.second]; 
                 }
+            );
 
-                if (is_smallest)
-                {
-                    return current_node->distance();
-                }
-            }
+            to_visit.erase(current, current + 1); // remove from the queue
 
-            auto update_distance = [nodes, current_node](Node *&other)
-            {
-                size_t d = current_node->distance() + 1;
+            const size_t row = current->first;
+            const size_t col = current->second;
+            const size_t idx = (row * _row_size) + col;
+            const size_t d = distances[idx] + 1;
 
-                if (d < other->distance())
-                {
-                    other->set_distance(d);
-                }
-            };
-
-            cout << "\t- Visiting nodes...\n";
+            cout << "Visiting [" << row << ", " << col << "] (d=" << distances[idx] << ")\n";
 
             // UP
-            if (current_node->row < _row_size - 1)
+            if (row < _row_size - 1)
             {
-                auto up = find_node(current_node->row + 1, current_node->col);
+                const size_t up_dx = ((row + 1) * _row_size) + col;
 
-                cout << "\t- Up: " << up->row
-                     << ", " << up->col
-                     << "(d=" << up->distance() << ")\n";
-
-                update_distance(up);
+                if (d < distances[up_dx])
+                {
+                    distances[up_dx] = d;
+                }
             }
 
             // DOWN
-            if (current_node->row > 0)
+            if (row > 0)
             {
-                cout << "Getting the down with the sickness\n";
+                const size_t down_idx = ((row - 1) * _row_size) + col;
 
-                auto down = find_node(current_node->row - 1, current_node->col);
-
-                cout << "\t- Down: " << down->row
-                     << ", " << down->col
-                     << "(d=" << down->distance() << ")\n";
-
-                update_distance(down);
-            }
-
-            // LEFT
-            if (current_node->col > 0)
-            {
-                auto left = find_node(current_node->row, current_node->col - 1);
-
-                cout << "\t- Left: " << left->row
-                     << ", " << left->col
-                     << "(d=" << left->distance() << ")\n";
-
-                update_distance(left);
+                if (d < distances[down_idx])
+                {
+                    distances[down_idx] = d;
+                }
             }
 
             // RIGHT
-            if (current_node->col < _col_size - 1)
+            if (col < _col_size - 1)
             {
-                auto right = find_node(current_node->row, current_node->col + 1);
+                const size_t right_idx = (row  * _row_size) + col + 1;
 
-                cout << "\t- Right: " << right->row
-                     << ", " << right->col
-                     << "(d=" << right->distance() << ")\n";
-
-                update_distance(right);
+                if (d < distances[right_idx])
+                {
+                    distances[right_idx] = d;
+                }
             }
 
-            current_node = nullptr;
-            for (auto &n : nodes)
+            // LEFT
+            if (col > 0)
             {
-                if (n.is_visited())
-                {
-                    continue;
-                }
+                const size_t left_idx = (row  * _row_size) + col - 1;
 
-                if (current_node == nullptr || n.distance() < current_node->distance())
+                if (d < distances[left_idx])
                 {
-                    current_node = &n;
-
-                    continue;
+                    distances[left_idx] = d;
                 }
             }
         }
 
-        for (const auto &n : nodes)
-            if (is_end(n))
-                return n.distance();
+        const size_t end_idx = (_row_size * _target.first) + _target.second;
 
-        cout << "Unable to find shortest route!\n";
-        exit(1);
+        return distances[end_idx];
     }
 };
